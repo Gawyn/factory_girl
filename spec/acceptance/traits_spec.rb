@@ -684,6 +684,11 @@ describe "traits used in associations" do
       belongs_to :author, class_name: 'User'
     end
 
+    define_model("Rating", comment_id: :integer) do
+      belongs_to :comment
+      has_one :user, :through => :comment
+    end
+
     FactoryGirl.define do
       factory :user do
         admin false
@@ -704,6 +709,10 @@ describe "traits used in associations" do
       factory :order do
         association :creator, :admin, factory: :user, name: 'Joe Creator'
       end
+
+      factory :rating do
+        association :user
+      end
     end
   end
 
@@ -723,5 +732,11 @@ describe "traits used in associations" do
     creator = FactoryGirl.create(:order).creator
     expect(creator).to be_admin
     expect(creator.name).to eq 'Joe Creator'
+  end
+
+  it "allows assigning traits for an association of an association" do
+    user = FactoryGirl.create(:rating).user
+    expect(user).to be_admin
+    expect(user.name).to eq 'Joe Slick'
   end
 end
